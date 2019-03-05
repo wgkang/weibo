@@ -12,19 +12,19 @@ class UsersController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth',[
-            'except' => ['show','create','store','index','confirmEmail']
+        $this->middleware('auth', [
+            'except' => ['show', 'create', 'store', 'index', 'confirmEmail']
         ]);
 
-        $this->middleware('guest',[
-            'only' => ['create','store','confirmEmail']
+        $this->middleware('guest', [
+            'only' => ['create', 'store', 'confirmEmail']
         ]);
     }
 
     public function index()
     {
         $users = User::paginate(10);
-        return view('users.index',compact('users'));
+        return view('users.index', compact('users'));
     }
 
     public function create()
@@ -53,20 +53,20 @@ class UsersController extends Controller
 
     public function confirmEmail($token)
     {
-        $user = User::where('activation_token',$token)->firstOrFail();
+        $user = User::where('activation_token', $token)->firstOrFail();
         $user->activation = true;
         $user->activation_token = null;
         $user->save();
 
         Auth::login($user);
-        session()->flash('success','恭喜你，激活成功。');
-        return  redirect()->route('users.show',$user->id);
+        session()->flash('success', '恭喜你，激活成功。');
+        return redirect()->route('users.show', $user->id);
     }
 
     public function edit(User $user)
     {
-        $this->authorize('update',$user);
-        return view('users.edit',compact('user'));
+        $this->authorize('update', $user);
+        return view('users.edit', compact('user'));
     }
 
     /**
@@ -75,7 +75,7 @@ class UsersController extends Controller
      */
     public function update(User $user, Request $request)
     {
-        $this->authorize('update',$user);
+        $this->authorize('update', $user);
         $this->validate($request, [
             'name'     => 'required|max:60',
             'password' => 'nullable|confirmed|min:5'
@@ -96,7 +96,7 @@ class UsersController extends Controller
     {
         $this->authorize('destroy', $user);
         $user->delete();
-        session()->flash('success','删除成功。');
-        return  back();
+        session()->flash('success', '删除成功。');
+        return back();
     }
 }
