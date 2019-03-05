@@ -3,7 +3,7 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 
 class RedirectIfAuthenticated
 {
@@ -17,8 +17,9 @@ class RedirectIfAuthenticated
      */
     public function handle($request, Closure $next, $guard = null)
     {
-        if (Auth::check()) {
-            return redirect()->route('users.show',[Auth::user()]);
+        if (Auth::guard($guard)->check()) {
+            session()->flash('success','您已经登录，无需再次操作');
+            return redirect('/');
         }
 
         return $next($request);

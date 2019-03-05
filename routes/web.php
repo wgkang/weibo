@@ -15,19 +15,9 @@ Route::get('/', 'StaticPagesController@home')->name('home');
 Route::get('/help', 'StaticPagesController@help')->name('help');
 Route::get('/about', 'StaticPagesController@about')->name('about');
 
-//登录后允许访问
-Route::group(['middleware'=>'member'],function (){
-    Route::delete('logout','SessionsController@destroy')->name('logout');
-    Route::resource('users','UsersController');
-});
+Route::resource('users','UsersController');
 
-//未登录允许访问
-Route::group(['middleware'=>'guest'],function (){
-    Route::get('signup','UsersController@create')->name('signup');
-    Route::get('login','SessionsController@create')->name('login');
-    Route::post('login','SessionsController@store')->name('login');
-});
-
-
-
-
+Route::get('signup','UsersController@create')->name('signup');
+Route::get('login','SessionsController@create')->name('login');
+Route::post('login','SessionsController@store')->name('login');
+Route::delete('logout','SessionsController@destroy')->name('logout');
