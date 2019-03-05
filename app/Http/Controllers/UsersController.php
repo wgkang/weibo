@@ -6,23 +6,24 @@ use App\Http\Requests\UsersFromRequest;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Auth;
+use App\Http\Controllers\MsgsController;
 
 class UsersController extends Controller
 {
     public function __construct()
     {
         $this->middleware('auth',[
-            'except' => ['create','store','index']
+            'except' => ['show','create','store','index','confirmEmail']
         ]);
 
         $this->middleware('guest',[
-            'only' => ['create','store']
+            'only' => ['create','store','confirmEmail']
         ]);
     }
 
     public function index()
     {
-        $users = User::all();
+        $users = User::paginate(10);
         return view('users.index',compact('users'));
     }
 
@@ -44,9 +45,22 @@ class UsersController extends Controller
             'password' => bcrypt($request->password)
         ]);
 
+        $msg = new MsgsController();
+        $msg->sendEmail($user);
+        session()->flash('success', '验证邮件已发送到您的注册邮箱，请注意查收。');
+        return redirect('/');
+    }
+
+    public function confirmEmail($token)
+    {
+        $user = User::where('activation_token',$token)->firstOrFail();
+        $user->activation = true;
+        $user->activation_token = null;
+        $user->save();
+
         Auth::login($user);
-        session()->flash('success', '欢迎，您将在这里开启一段新的旅程');
-        return redirect()->route('users.show', $user);
+        session()->flash('success','恭喜你，激活成功。');
+        return  redirect()->route('users.show',$user->id);
     }
 
     public function edit(User $user)
@@ -76,5 +90,13 @@ class UsersController extends Controller
 
         session()->flash('success', '资料修改成功。');
         return redirect()->route('users.show', $user->id);
+    }
+
+    public function destroy(User $user)
+    {
+        $this->authorize('destroy', $user);
+        $user->delete();
+        session()->flash('success','删除成功。');
+        return  back();
     }
 }
