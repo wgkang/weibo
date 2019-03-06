@@ -34,7 +34,8 @@ class UsersController extends Controller
 
     public function show(User $user)
     {
-        return view('users.show', compact('user'));
+        $statuses = $user->statuses()->orderBy('created_at','desc')->paginate(15);
+        return view('users.show', compact('user','statuses'));
     }
 
     public function store(UsersFromRequest $request)
@@ -51,6 +52,10 @@ class UsersController extends Controller
         return redirect('/');
     }
 
+    /**
+     * @param $token
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function confirmEmail($token)
     {
         $user = User::where('activation_token', $token)->firstOrFail();
@@ -63,6 +68,11 @@ class UsersController extends Controller
         return redirect()->route('users.show', $user->id);
     }
 
+    /**
+     * @param User $user
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
     public function edit(User $user)
     {
         $this->authorize('update', $user);
@@ -72,6 +82,7 @@ class UsersController extends Controller
     /**
      * @param Request $request
      * @throws \Illuminate\Validation\ValidationException
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function update(User $user, Request $request)
     {
@@ -92,6 +103,12 @@ class UsersController extends Controller
         return redirect()->route('users.show', $user->id);
     }
 
+    /**
+     * @param User $user
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     * @throws \Exception
+     */
     public function destroy(User $user)
     {
         $this->authorize('destroy', $user);
