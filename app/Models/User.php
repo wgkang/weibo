@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use function foo\func;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -65,6 +64,40 @@ class User extends Authenticatable
 
     public function feed()
     {
-        return  $this->statuses()->orderBy('created_at','desc');
+        $followings_ids = $this->followings->pluck('id')->toArray();
+        array_push($followings_ids,$this->id);
+        return Status::whereIn('user_id', $followings_ids)->with('user')->orderBy('created_at','desc');
     }
+
+    public function followers()
+    {
+        return $this->belongsToMany(User::class, 'followers', 'user_id', 'follower_id');
+    }
+
+    public function followings()
+    {
+        return $this->belongsToMany(User::class, 'followers', 'follower_id', 'user_id');
+    }
+
+    public function follow($user_ids)
+    {
+        if (!is_array($user_ids)) {
+            $user_ids = compact('user_ids');
+        }
+        $this->followings()->sync($user_ids, false);
+    }
+
+    public function unfollow($user_ids)
+    {
+        if (!is_array($user_ids)) {
+            $user_ids = compact('user_ids');
+        }
+        $this->followings()->detach($user_ids);
+    }
+
+    public function isFollowing($user_id)
+    {
+        return $this->followings->contains($user_id);
+    }
+
 }

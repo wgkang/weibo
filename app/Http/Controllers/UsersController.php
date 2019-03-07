@@ -34,8 +34,8 @@ class UsersController extends Controller
 
     public function show(User $user)
     {
-        $statuses = $user->statuses()->orderBy('created_at','desc')->paginate(15);
-        return view('users.show', compact('user','statuses'));
+        $statuses = $user->statuses()->orderBy('created_at', 'desc')->paginate(15);
+        return view('users.show', compact('user', 'statuses'));
     }
 
     public function store(UsersFromRequest $request)
@@ -80,7 +80,6 @@ class UsersController extends Controller
     }
 
     /**
-     * @param Request $request
      * @throws \Illuminate\Validation\ValidationException
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
@@ -104,7 +103,6 @@ class UsersController extends Controller
     }
 
     /**
-     * @param User $user
      * @return \Illuminate\Http\RedirectResponse
      * @throws \Illuminate\Auth\Access\AuthorizationException
      * @throws \Exception
@@ -115,5 +113,19 @@ class UsersController extends Controller
         $user->delete();
         session()->flash('success', '删除成功。');
         return back();
+    }
+
+    public function followings(User $user)
+    {
+        $users = $user->followings()->paginate(20);
+        $title = $user->name . '的粉丝';
+        return view('users.show_follow', compact('users', 'title'));
+    }
+
+    public function followers(User $user)
+    {
+        $users = $user->followers()->paginate(20);
+        $title = $user->name . '关注的人';
+        return view('users.show_follow', compact('users', 'title'));
     }
 }
