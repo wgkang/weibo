@@ -27,9 +27,9 @@ class SessionsController extends Controller
     {
         $param = $this->validate($request,[
             'email'=>'required|email|max:255',
-            'password'=>'required'
+            'password'=>'required',
         ]);
-
+        unset($param['captcha']);
         if (Auth::attempt($param, $request->has('remember'))){
             if (Auth::user()->activation){
                 session()->flash('success','欢迎回来');

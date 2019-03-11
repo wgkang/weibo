@@ -26,7 +26,16 @@ class UsersFromRequest extends FormRequest
         return [
             'name'=>'required|max:50',
             'email'=>'required|email|unique:users|max:225',
-            'password'=>'required|confirmed|min:5'
+            'password'=>'required|confirmed|min:5',
+            'captcha'=>'required|captcha'
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'captcha.required'=>'验证码不能为空',
+            'captcha.captcha'=>'验证码错误'
         ];
     }
 }

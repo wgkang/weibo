@@ -26,6 +26,19 @@
                     </div>
 
                     <div class="form-group">
+                        <label for="captcha">验证码:</label>
+                        <div class="row">
+                            <input id="captcha" class="mt-1 ml-3 col-md-6 form-control{{ $errors->has('captcha') ? ' is-invalid' : '' }}" name="captcha" required>
+                            <img class="thumbnail captcha col-md-4" src="{{ captcha_src('flat') }}" onclick="this.src='/captcha/flat?'+Math.random()" title="点击图片重新获取验证码">
+                        </div>
+                        @if ($errors->has('captcha'))
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $errors->first('captcha') }}</strong>
+                              </span>
+                        @endif
+                    </div>
+
+                    <div class="form-group">
                         <label for="password_confirmation">确认密码：</label>
                         <input type="password" name="password_confirmation" class="form-control" value="{{ old('password_confirmation') }}">
                     </div>
